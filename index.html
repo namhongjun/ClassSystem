@@ -14,21 +14,112 @@
     </header>
     <nav>
         <ul>
-            <li><a href="#">대시보드</a></li>
-            <li><a href="#">교육 일정</a></li>
-            <li><a href="#">출석 관리</a></li>
-            <li><a href="#">설정</a></li>
+            <li><a href="#" id="nav-dashboard">대시보드</a></li>
+            <li><a href="#" id="nav-schedule">교육 일정</a></li>
+            <li><a href="#" id="nav-attendance">출석 관리</a></li>
+            <li><a href="#" id="nav-settings">설정</a></li>
         </ul>
     </nav>
     <main>
-        <section>
+        <!-- 대시보드 섹션 -->
+        <section id="dashboard" class="section active">
             <h3>환영합니다</h3>
             <p>교육관리시스템을 통해 교육 일정과 진행 현황을 관리할 수 있습니다.</p>
+        </section>
+
+        <!-- 교육 일정 섹션 -->
+        <section id="schedule" class="section">
+            <h3>교육 일정</h3>
+            <p>1일차 ~ 5일차 교육 일정을 확인하세요.</p>
+            <!-- 일정 테이블 등 추가 가능 -->
+        </section>
+
+        <!-- 출석 관리 섹션 -->
+        <section id="attendance" class="section">
+            <h3>출석 관리</h3>
+            <div class="tabs">
+                <button class="tab-button active" data-day="1">1일차</button>
+                <button class="tab-button" data-day="2">2일차</button>
+                <button class="tab-button" data-day="3">3일차</button>
+                <button class="tab-button" data-day="4">4일차</button>
+                <button class="tab-button" data-day="5">5일차</button>
+            </div>
+            <div class="tab-contents">
+                <!-- 각 일차별 출석 폼 -->
+                ${[1,2,3,4,5].map(day => `
+                <div id="day-${day}" class="tab-content ${day===1 ? 'active' : ''}">
+                    <h4>${day}일차 출석 관리</h4>
+                    <div class="attendance-form">
+                        <div class="section">
+                            <h5>입실</h5>
+                            <button class="qr-scan" data-day="${day}" data-type="in">QR 코드 스캔</button>
+                            <canvas id="sig-${day}-in" class="signature-pad" width="300" height="150"></canvas>
+                        </div>
+                        <div class="section">
+                            <h5>퇴실</h5>
+                            <button class="qr-scan" data-day="${day}" data-type="out">QR 코드 스캔</button>
+                            <canvas id="sig-${day}-out" class="signature-pad" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </section>
+
+        <!-- 설정 섹션 -->
+        <section id="settings" class="section">
+            <h3>설정</h3>
+            <p>사용자 및 시스템 설정을 관리합니다.</p>
         </section>
     </main>
     <footer>
         <p>&copy; 2025 한국농어촌공사 인재개발원 인재육성부</p>
     </footer>
-    <script src="scripts.js"></script>
+    <script>
+        // 네비게이션 및 탭 전환 스크립트
+        document.querySelectorAll('nav ul li a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = this.id.replace('nav-', '');
+                document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+            });
+        });
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const day = this.dataset.day;
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                document.getElementById(`day-${day}`).classList.add('active');
+            });
+        });
+
+        // 서명 캔버스 초기화
+        document.querySelectorAll('.signature-pad').forEach(canvas => {
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            canvas.addEventListener('mousedown', () => drawing = true);
+            canvas.addEventListener('mouseup', () => drawing = false);
+            canvas.addEventListener('mouseout', () => drawing = false);
+            canvas.addEventListener('mousemove', e => {
+                if (!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke();
+            });
+        });
+
+        // QR 스캔 버튼 (샘플 동작)
+        document.querySelectorAll('.qr-scan').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const day = this.dataset.day;
+                const type = this.dataset.type;
+                alert(`${day}일차 ${type === 'in' ? '입실' : '퇴실'} 출석이 등록되었습니다.`);
+            });
+        });
+    </script>
 </body>
 </html>
