@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출석 관리</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>한국농어촌공사 인재개발원</h1>
+        <h2>인재육성부 출석 관리</h2>
+        <nav><a href="index.html">← 메인으로 돌아가기</a></nav>
+    </header>
+    <main>
+        <div class="tabs">
+            <button class="tab-button active" data-day="1">1일차</button>
+            <button class="tab-button" data-day="2">2일차</button>
+            <button class="tab-button" data-day="3">3일차</button>
+            <button class="tab-button" data-day="4">4일차</button>
+            <button class="tab-button" data-day="5">5일차</button>
+        </div>
+        <div class="tab-contents">
+            <!-- 1일차 ~ 5일차 출석 폼 -->
+            <div id="day-1" class="tab-content active">
+                <h3>1일차 출석 관리</h3>
+                <div class="attendance-block">
+                    <div class="attendance-item">
+                        <h4>입실</h4>
+                        <button class="qr-scan" data-day="1" data-type="in">QR 코드 스캔</button>
+                        <canvas id="sig-1-in" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                    <div class="attendance-item">
+                        <h4>퇴실</h4>
+                        <button class="qr-scan" data-day="1" data-type="out">QR 코드 스캔</button>
+                        <canvas id="sig-1-out" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div id="day-2" class="tab-content">
+                <h3>2일차 출석 관리</h3>
+                <div class="attendance-block">
+                    <div class="attendance-item">
+                        <h4>입실</h4>
+                        <button class="qr-scan" data-day="2" data-type="in">QR 코드 스캔</button>
+                        <canvas id="sig-2-in" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                    <div class="attendance-item">
+                        <h4>퇴실</h4>
+                        <button class="qr-scan" data-day="2" data-type="out">QR 코드 스캔</button>
+                        <canvas id="sig-2-out" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div id="day-3" class="tab-content">
+                <h3>3일차 출석 관리</h3>
+                <div class="attendance-block">
+                    <div class="attendance-item">
+                        <h4>입실</h4>
+                        <button class="qr-scan" data-day="3" data-type="in">QR 코드 스캔</button>
+                        <canvas id="sig-3-in" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                    <div class="attendance-item">
+                        <h4>퇴실</h4>
+                        <button class="qr-scan" data-day="3" data-type="out">QR 코드 스캔</button>
+                        <canvas id="sig-3-out" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div id="day-4" class="tab-content">
+                <h3>4일차 출석 관리</h3>
+                <div class="attendance-block">
+                    <div class="attendance-item">
+                        <h4>입실</h4>
+                        <button class="qr-scan" data-day="4" data-type="in">QR 코드 스캔</button>
+                        <canvas id="sig-4-in" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                    <div class="attendance-item">
+                        <h4>퇴실</h4>
+                        <button class="qr-scan" data-day="4" data-type="out">QR 코드 스캔</button>
+                        <canvas id="sig-4-out" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div id="day-5" class="tab-content">
+                <h3>5일차 출석 관리</h3>
+                <div class="attendance-block">
+                    <div class="attendance-item">
+                        <h4>입실</h4>
+                        <button class="qr-scan" data-day="5" data-type="in">QR 코드 스캔</button>
+                        <canvas id="sig-5-in" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                    <div class="attendance-item">
+                        <h4>퇴실</h4>
+                        <button class="qr-scan" data-day="5" data-type="out">QR 코드 스캔</button>
+                        <canvas id="sig-5-out" class="signature-pad" width="300" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 한국농어촌공사 인재개발원 인재육성부</p>
+    </footer>
+    <script>
+        // 탭 전환
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const day = btn.dataset.day;
+                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                document.getElementById(`day-${day}`).classList.add('active');
+            });
+        });
+
+        // 서명판 초기화
+        document.querySelectorAll('.signature-pad').forEach(canvas => {
+            const ctx = canvas.getContext('2d'); let drawing=false;
+            canvas.addEventListener('mousedown', () => drawing=true);
+            canvas.addEventListener('mouseup', () => drawing=false);
+            canvas.addEventListener('mousemove', e => {
+                if(!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineWidth = 2; ctx.lineCap = 'round';
+                ctx.lineTo(e.clientX-rect.left, e.clientY-rect.top);
+                ctx.stroke();
+            });
+        });
+
+        // QR 스캔 (더미 동작)
+        document.querySelectorAll('.qr-scan').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const day = btn.dataset.day, type = btn.dataset.type;
+                alert(`${day}일차 ${type==='in'?'입실':'퇴실'} 출석 완료`);
+            });
+        });
+    </script>
+</body>
+</html>
